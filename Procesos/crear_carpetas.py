@@ -3,7 +3,7 @@ import os
 
 def crear_estructura_carpetas():
     carpeta_principal = os.path.join(os.path.expanduser('~'), 'Downloads', 'ARCHIVOS TITULADA')
-    subcarpetas = ['TECNICO', 'TECNOLOGO', 'AUXILIAR', 'OPERARIO']
+    subcarpetas = ['Técnico', 'Tecnólogo', 'Auxiliar', 'Operario']
 
     try:
         if not os.path.exists(carpeta_principal):
