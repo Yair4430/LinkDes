@@ -1,3 +1,5 @@
+# procesar_links.py (añade estas líneas al inicio)
+from crear_carpetas import crear_estructura_carpetas
 import pandas as pd
 import re
 import sys
@@ -19,6 +21,7 @@ def transformar_link(link):
     return None  # Si no se puede transformar
 
 def buscar_y_descargar_links(archivo_excel, columna, navegador, fila_desde, fila_hasta):
+    ruta_destino = crear_estructura_carpetas()
     if archivo_excel.endswith('.xlsx'):
         df = pd.read_excel(archivo_excel)
     elif archivo_excel.endswith('.csv'):
