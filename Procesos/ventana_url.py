@@ -19,6 +19,7 @@ def iniciar():
     navegador = navegador_var.get()
     fila_desde = entry_fila_desde.get().strip()
     fila_hasta = entry_fila_hasta.get().strip()
+    columna_carpeta = entry_columna_carpeta.get().strip()
 
     if not archivo or not os.path.isfile(archivo):
         messagebox.showerror("Error", "Selecciona un archivo válido.")
@@ -32,10 +33,13 @@ def iniciar():
     if not fila_desde.isdigit() or not fila_hasta.isdigit():
         messagebox.showerror("Error", "Las filas deben ser números enteros.")
         return
+    if not columna_carpeta:
+        messagebox.showerror("Error", "Escribe el nombre exacto de la columna para crear las carpetas.")
+        return
 
     ruta_procesar = os.path.join(os.path.dirname(__file__), "procesar_links.py")
     subprocess.Popen([
-        sys.executable, ruta_procesar, archivo, columna, navegador.lower(), fila_desde, fila_hasta
+        sys.executable, ruta_procesar, archivo, columna, navegador.lower(), fila_desde, fila_hasta, columna_carpeta
     ])
 
 # Crear ventana
@@ -56,6 +60,11 @@ btn_examinar.pack(side=tk.LEFT)
 tk.Label(ventana, text="Nombre exacto de la columna con los links:").pack(pady=(15,0))
 entry_columna = tk.Entry(ventana, width=30)
 entry_columna.pack()
+
+# Nueva entrada para nombre de columna de carpetas
+tk.Label(ventana, text="Nombre exacto de la columna para nombrar las carpetas:").pack(pady=(10,0))
+entry_columna_carpeta = tk.Entry(ventana, width=30)
+entry_columna_carpeta.pack()
 
 # Navegador
 tk.Label(ventana, text="Selecciona el navegador para abrir los links:").pack(pady=(15,0))

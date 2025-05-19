@@ -1,5 +1,5 @@
 # procesar_links.py (añade estas líneas al inicio)
-from crear_carpetas import crear_estructura_carpetas
+from crear_carpetas import crear_estructura_carpetas, crear_carpetas_por_fila
 import pandas as pd
 import re
 import sys
@@ -20,8 +20,10 @@ def transformar_link(link):
             return f'https://drive.google.com/uc?export=download&id={file_id}'
     return None  # Si no se puede transformar
 
-def buscar_y_descargar_links(archivo_excel, columna, navegador, fila_desde, fila_hasta):
+
+def buscar_y_descargar_links(archivo_excel, columna, navegador, fila_desde, fila_hasta, columna_carpeta):
     ruta_destino = crear_estructura_carpetas()
+
     if archivo_excel.endswith('.xlsx'):
         df = pd.read_excel(archivo_excel)
     elif archivo_excel.endswith('.csv'):
@@ -30,14 +32,18 @@ def buscar_y_descargar_links(archivo_excel, columna, navegador, fila_desde, fila
         print("❌ Formato no soportado.")
         return
 
-    if columna not in df.columns:
-        print(f"❌ La columna '{columna}' no existe.")
+    if columna not in df.columns or columna_carpeta not in df.columns:
+        print(f"❌ Las columnas '{columna}' o '{columna_carpeta}' no existen.")
         return
+
+    df_rango = df.iloc[fila_desde:fila_hasta]
+
+    # Crear carpetas con nombres de la columna especificada
+    nombres_carpetas = df_rango[columna_carpeta].dropna().unique()
+    crear_carpetas_por_fila(ruta_destino, nombres_carpetas)
 
     link_pattern = re.compile(r'https://drive\.google\.com/[^\s,"]+')
     encontrados = []
-
-    df_rango = df.iloc[fila_desde:fila_hasta]
 
     for val in df_rango[columna].dropna():
         links = link_pattern.findall(str(val))
@@ -69,8 +75,8 @@ def buscar_y_descargar_links(archivo_excel, columna, navegador, fila_desde, fila
         subprocess.Popen([exe_navegador, link])
 
 if __name__ == "__main__":
-    if len(sys.argv) < 6:
-        print("Uso: python procesar_links.py <archivo_excel> <nombre_columna> <navegador> <fila_desde> <fila_hasta>")
+    if len(sys.argv) < 7:
+        print("Uso: python procesar_links.py <archivo_excel> <nombre_columna> <navegador> <fila_desde> <fila_hasta> <columna_carpeta>")
         sys.exit(1)
 
     archivo_excel = sys.argv[1]
@@ -78,9 +84,10 @@ if __name__ == "__main__":
     navegador = sys.argv[3].lower()
     fila_desde = int(sys.argv[4]) - 1
     fila_hasta = int(sys.argv[5])
+    columna_carpeta = sys.argv[6]
 
     if not os.path.exists(archivo_excel):
         print(f"❌ El archivo '{archivo_excel}' no existe.")
         sys.exit(1)
 
-    buscar_y_descargar_links(archivo_excel, nombre_columna, navegador, fila_desde, fila_hasta)
+    buscar_y_descargar_links(archivo_excel, nombre_columna, navegador, fila_desde, fila_hasta, columna_carpeta)
