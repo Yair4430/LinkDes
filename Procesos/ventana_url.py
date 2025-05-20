@@ -45,45 +45,51 @@ def iniciar():
 # Crear ventana
 ventana = tk.Tk()
 ventana.title("Abrir Links desde Excel")
-ventana.geometry("600x350")
+ventana.geometry("600x400")
+ventana.resizable(False, False)
 
-# Archivo Excel
-tk.Label(ventana, text="Selecciona el archivo Excel o CSV:").pack(pady=(10,0))
-frame_archivo = tk.Frame(ventana)
-frame_archivo.pack(pady=5)
+# Estilo general
+padding_args = {'padx': 10, 'pady': 5, 'sticky': 'w'}
+
+# === ARCHIVO ===
+frame_archivo = tk.LabelFrame(ventana, text="Archivo", padx=10, pady=10)
+frame_archivo.pack(fill="x", padx=15, pady=10)
+
+tk.Label(frame_archivo, text="Selecciona el archivo Excel o CSV:").grid(row=0, column=0, columnspan=2, **padding_args)
 entry_archivo = tk.Entry(frame_archivo, width=50)
-entry_archivo.pack(side=tk.LEFT, padx=(0,5))
+entry_archivo.grid(row=1, column=0, **padding_args)
 btn_examinar = tk.Button(frame_archivo, text="Examinar", command=seleccionar_archivo)
-btn_examinar.pack(side=tk.LEFT)
+btn_examinar.grid(row=1, column=1, **padding_args)
 
-# Nombre columna
-tk.Label(ventana, text="Nombre exacto de la columna con los links:").pack(pady=(15,0))
-entry_columna = tk.Entry(ventana, width=30)
-entry_columna.pack()
+# === OPCIONES ===
+frame_opciones = tk.LabelFrame(ventana, text="Opciones", padx=10, pady=10)
+frame_opciones.pack(fill="x", padx=15, pady=10)
 
-# Nueva entrada para nombre de columna de carpetas
-tk.Label(ventana, text="Nombre exacto de la columna para nombrar las carpetas:").pack(pady=(10,0))
-entry_columna_carpeta = tk.Entry(ventana, width=30)
-entry_columna_carpeta.pack()
+tk.Label(frame_opciones, text="Columna con los links:").grid(row=0, column=0, **padding_args)
+entry_columna = tk.Entry(frame_opciones)
+entry_columna.grid(row=0, column=1, **padding_args)
 
-# Navegador
-tk.Label(ventana, text="Selecciona el navegador para abrir los links:").pack(pady=(15,0))
+tk.Label(frame_opciones, text="Columna para carpetas:").grid(row=1, column=0, **padding_args)
+entry_columna_carpeta = tk.Entry(frame_opciones)
+entry_columna_carpeta.grid(row=1, column=1, **padding_args)
+
+tk.Label(frame_opciones, text="Navegador:").grid(row=2, column=0, **padding_args)
 navegador_var = tk.StringVar()
-navegador_var.set("Chrome")  # valor por defecto
-navegador_opciones = tk.OptionMenu(ventana, navegador_var, "Firefox", "Chrome", "Edge")
-navegador_opciones.pack()
+navegador_var.set("Chrome")
+navegador_opciones = tk.OptionMenu(frame_opciones, navegador_var, "Firefox", "Chrome", "Edge")
+navegador_opciones.grid(row=2, column=1, **padding_args)
 
-# Fila desde
-tk.Label(ventana, text="Fila desde (ej. 2):").pack(pady=(15,0))
-entry_fila_desde = tk.Entry(ventana, width=10)
-entry_fila_desde.pack()
+tk.Label(frame_opciones, text="Fila desde (ej. 2):").grid(row=3, column=0, **padding_args)
+entry_fila_desde = tk.Entry(frame_opciones, width=10)
+entry_fila_desde.grid(row=3, column=1, **padding_args)
 
-# Fila hasta
-tk.Label(ventana, text="Fila hasta (ej. 20):").pack(pady=(10,0))
-entry_fila_hasta = tk.Entry(ventana, width=10)
-entry_fila_hasta.pack()
+tk.Label(frame_opciones, text="Fila hasta (ej. 20):").grid(row=4, column=0, **padding_args)
+entry_fila_hasta = tk.Entry(frame_opciones, width=10)
+entry_fila_hasta.grid(row=4, column=1, **padding_args)
 
-# Botón iniciar
-tk.Button(ventana, text="Iniciar", command=iniciar).pack(pady=20)
+# === BOTÓN INICIAR ===
+frame_boton = tk.Frame(ventana)
+frame_boton.pack(pady=15)
+tk.Button(frame_boton, text="Iniciar", command=iniciar, width=20, bg="#4CAF50", fg="white").pack()
 
 ventana.mainloop()
