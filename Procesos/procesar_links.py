@@ -73,6 +73,20 @@ def transformar_link(link):
             return f'https://drive.google.com/uc?export=download&id={file_id}'
     return None
 
+def mover_pdf_a_carpeta(ruta_pdf, destino):
+    # Verificar que el PDF sea válido
+    if not es_pdf_valido(ruta_pdf):
+        print("❌ El archivo PDF está corrupto y no se moverá.")
+        return None
+
+    try:
+        shutil.move(ruta_pdf, destino)
+        print(f"✅ PDF movido a: {destino}")
+        return destino
+    except Exception as e:
+        print(f"❌ Error al mover archivo: {e}")
+        return None
+
 def buscar_y_descargar_links(archivo_excel, columna, navegador, fila_desde, fila_hasta, columna_carpeta):
     ruta_destino = crear_estructura_carpetas()
 
@@ -99,7 +113,7 @@ def buscar_y_descargar_links(archivo_excel, columna, navegador, fila_desde, fila
         return
 
     exe_navegador = rutas[navegador]
-    df_rango = df.iloc[fila_desde:fila_hasta]  # Asegúrate de que esto esté correcto
+    df_rango = df.iloc[fila_desde:fila_hasta]
 
     nombres_carpetas = df_rango[columna_carpeta].dropna().unique()
     crear_carpetas_por_fila(ruta_destino, nombres_carpetas)
@@ -110,10 +124,8 @@ def buscar_y_descargar_links(archivo_excel, columna, navegador, fila_desde, fila
     # Abre todos los enlaces simultáneamente
     for i, row in df_rango.iterrows():
         val = row[columna]
-        nombre_carpeta = str(row[columna_carpeta])
         links = link_pattern.findall(str(val))
 
-        # Asegúrate de que solo se abran los enlaces encontrados
         for link in links:
             nuevo_link = transformar_link(link)
             if nuevo_link:
@@ -124,13 +136,19 @@ def buscar_y_descargar_links(archivo_excel, columna, navegador, fila_desde, fila
     time.sleep(60)  # Espera 60 segundos
 
     # Mueve los PDFs a las carpetas correspondientes
+    carpeta_descargas = os.path.join(os.path.expanduser('~'), 'Downloads')
+    archivos_pdf = [f for f in os.listdir(carpeta_descargas) if f.endswith('.pdf')]
+
     for i, row in df_rango.iterrows():
         nombre_carpeta = str(row[columna_carpeta])
         destino_final = os.path.join(ruta_destino, nombre_carpeta)
         os.makedirs(destino_final, exist_ok=True)
 
-        if mover_ultimo_pdf_a_carpeta(destino_final):
-            total_descargas += 1
+        for archivo_pdf in archivos_pdf:
+            if nombre_carpeta in archivo_pdf:  # Verifica si el nombre de la carpeta está en el nombre del PDF
+                ruta_pdf = os.path.join(carpeta_descargas, archivo_pdf)
+                mover_pdf_a_carpeta(ruta_pdf, destino_final)
+                total_descargas += 1
 
     if total_descargas == 0:
         print("⚠️ No se movió ningún archivo PDF.")
@@ -145,8 +163,8 @@ if __name__ == "__main__":
     archivo_excel = sys.argv[1]
     nombre_columna = sys.argv[2]
     navegador = sys.argv[3].lower()
-    fila_desde = int(sys.argv[4]) -1
-    fila_hasta = int(sys.argv[5])
+    fila_desde = int(sys.argv[4]) - 2  # Para convertir fila Excel a índice Python
+    fila_hasta = int(sys.argv[5]) - 1  # Corregir para que el rango sea inclusivo
     columna_carpeta = sys.argv[6]
 
     if not os.path.exists(archivo_excel):

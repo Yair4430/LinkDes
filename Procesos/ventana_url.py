@@ -13,6 +13,10 @@ def seleccionar_archivo():
         entry_archivo.delete(0, tk.END)
         entry_archivo.insert(0, ruta)
 
+def navegador_seleccionado(opcion):
+    # Mostrar sugerencia justo cuando el usuario seleccione un navegador
+    messagebox.showinfo("Sugerencia", f"Asegúrate de que el navegador '{opcion}' esté abierto antes de continuar.")
+
 def iniciar():
     archivo = entry_archivo.get().strip()
     columna = entry_columna.get().strip()
@@ -76,7 +80,16 @@ entry_columna_carpeta.grid(row=1, column=1, **padding_args)
 tk.Label(frame_opciones, text="Navegador:").grid(row=2, column=0, **padding_args)
 navegador_var = tk.StringVar()
 navegador_var.set("Chrome")
-navegador_opciones = tk.OptionMenu(frame_opciones, navegador_var, "Firefox", "Chrome", "Edge")
+
+# Crear menú de opciones con función callback
+navegador_opciones = tk.OptionMenu(
+    frame_opciones,
+    navegador_var,
+    "Firefox",
+    "Chrome",
+    "Edge",
+    command=navegador_seleccionado  # <-- Esta es la clave
+)
 navegador_opciones.grid(row=2, column=1, **padding_args)
 
 tk.Label(frame_opciones, text="Fila desde (ej. 2):").grid(row=3, column=0, **padding_args)
